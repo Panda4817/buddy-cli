@@ -23,7 +23,7 @@ public class InfoCommands {
     @Autowired
     private StackOverflowClient stackOverflowClient;
 
-    @Command(command = "askgpt", description = "Ask ChatGPT a question")
+    @Command(command = "gpt", description = "Ask ChatGPT a question")
     public String askChatGpt(@Option(longNames = {"question"}, shortNames = {'q'}, required = true,
             description = "Your question in single or double quotes") String question) {
         OpenAiRequest request = new OpenAiRequest("gpt-3.5-turbo", List.of(new OpenAiMessage("user", question)));
@@ -38,7 +38,7 @@ public class InfoCommands {
 
     }
 
-    @Command(command = "askStack", description = "Get a list of StackOverflow questions matching your query")
+    @Command(command = "stack", description = "Get a list of StackOverflow questions matching your query")
     public String askStackOverflow(@Option(longNames = {"query"}, shortNames = {'q'}, required = true,
             description = "Your query in single or double quotes") String query) {
 

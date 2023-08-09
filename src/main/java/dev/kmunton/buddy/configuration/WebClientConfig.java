@@ -3,6 +3,7 @@ package dev.kmunton.buddy.configuration;
 import dev.kmunton.buddy.clients.DadJokeClient;
 import dev.kmunton.buddy.clients.OpenAiClient;
 import dev.kmunton.buddy.clients.StackOverflowClient;
+import dev.kmunton.buddy.clients.XkcdClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,10 +34,19 @@ public class WebClientConfig {
     }
 
     @Bean
+    XkcdClient xkcdClient() {
+        WebClient webClient = WebClient.builder()
+                .baseUrl("https://xkcd.com")
+                .build();
+
+        return getClient(webClient, XkcdClient.class);
+
+    }
+
+    @Bean
     StackOverflowClient stackOverflowClient() {
         WebClient webClient = WebClient.builder()
                 .baseUrl("https://api.stackexchange.com")
-                .defaultHeader(ACCEPT, APPLICATION_JSON_VALUE)
                 .build();
 
         return getClient(webClient, StackOverflowClient.class);

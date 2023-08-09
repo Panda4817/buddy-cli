@@ -38,5 +38,4 @@ class ApplicationTests {
 		await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
 				.containsText("AVAILABLE COMMANDS"));
 	}
-
 }

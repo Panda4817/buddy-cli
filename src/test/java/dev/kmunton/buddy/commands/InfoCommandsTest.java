@@ -45,7 +45,7 @@ class InfoCommandsTest {
         OpenAiResponse response = new OpenAiResponse(List.of(choice));
         OpenAiRequest request = new OpenAiRequest("gpt-3.5-turbo", List.of(new OpenAiMessage("user", "question")));
         when(openAiClient.getChatGptAnswer(request)).thenReturn(response);
-        String command = "askgpt -q question";
+        String command = "gpt -q question";
 
 
         // When
@@ -71,7 +71,7 @@ class InfoCommandsTest {
         StackOverflowItem item2 = new StackOverflowItem("2", "question 2", false);
         when(stackOverflowClient.getQuestions("query", "desc", "relevance", "stackoverflow"))
                 .thenReturn(new StackOverflowResponse(List.of(item1, item2)));
-        String command = "askStack -q query";
+        String command = "stack -q query";
 
 
         // When

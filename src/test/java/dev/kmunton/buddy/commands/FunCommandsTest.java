@@ -1,8 +1,11 @@
 package dev.kmunton.buddy.commands;
 
 import dev.kmunton.buddy.clients.DadJokeClient;
+import dev.kmunton.buddy.clients.XkcdClient;
 import dev.kmunton.buddy.models.dadjoke.DadJokeResponse;
 import dev.kmunton.buddy.models.dadjoke.DadJokesList;
+import dev.kmunton.buddy.models.xkcd.XkcdComicResponse;
+import dev.kmunton.buddy.services.RockPaperScissorsGameService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,6 +29,12 @@ class FunCommandsTest {
 
     @MockBean
     private DadJokeClient dadJokeClient;
+
+    @MockBean
+    private XkcdClient xkcdClient;
+
+    @MockBean
+    private RockPaperScissorsGameService rockPaperScissorsGameService;
 
     @Test
     public void givenRandomJokeWanted_whenDadJokeCommandProvided_returnRandomJoke() {
@@ -74,6 +83,84 @@ class FunCommandsTest {
         await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
                 .containsText(testResponse1.joke())
                 .containsText(testResponse2.joke()));
+
+    }
+
+    @Test
+    public void givenCurrentXkcdComic_whenComicCommandProvided_returnComic() {
+        // Given
+        XkcdComicResponse response = new XkcdComicResponse("title", "image link", "alt text");
+        when(xkcdClient.getCurrentComic()).thenReturn(response);
+        String command = "comic";
+
+
+        // When
+        ShellTestClient.InteractiveShellSession session = client
+                .interactive()
+                .run();
+
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
+                .containsText("shell"));
+
+        session.write(session.writeSequence().text(command).carriageReturn().build());
+
+        // Then
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
+                .containsText(response.title()));
+
+    }
+
+    @Test
+    public void givenUserWins_whenRpsPlayed_returnUserWinText() {
+        // Given
+        when(rockPaperScissorsGameService.getOptions()).thenReturn(new String[]{"rock", "paper", "scissors"});
+        when(rockPaperScissorsGameService.getRandomChoice()).thenReturn("scissors");
+        String expectedText = "user win text";
+        when(rockPaperScissorsGameService.calculateWinnerBetweenBuddyAndUser("scissors", "rock"))
+                .thenReturn(expectedText);
+        String command = "rps";
+
+
+        // When
+        ShellTestClient.InteractiveShellSession session = client
+                .interactive()
+                .run();
+
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
+                .containsText("shell"));
+
+        session.write(session.writeSequence().text(command).carriageReturn().carriageReturn().build());
+
+        // Then
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
+                .containsText(expectedText));
+
+    }
+
+    @Test
+    public void givenBuddyWins_whenRpsPlayed_returnUBuddyWinText() {
+        // Given
+        when(rockPaperScissorsGameService.getOptions()).thenReturn(new String[]{"rock", "paper", "scissors"});
+        when(rockPaperScissorsGameService.getRandomChoice()).thenReturn("scissors");
+        String expectedText = "buddy win text";
+        when(rockPaperScissorsGameService.calculateWinnerBetweenBuddyAndUser("scissors", "paper"))
+                .thenReturn(expectedText);
+        String command = "rps";
+
+
+        // When
+        ShellTestClient.InteractiveShellSession session = client
+                .interactive()
+                .run();
+
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
+                .containsText("shell"));
+
+        session.write(session.writeSequence().text(command).carriageReturn().keyDown().carriageReturn().build());
+
+        // Then
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
+                .containsText(expectedText));
 
     }
 
