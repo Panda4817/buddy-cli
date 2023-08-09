@@ -13,15 +13,21 @@ Helpful terminal buddy with useful and fun commands, created using Spring Shell.
 
 To build jar and run tests:
 
-`mvn clean install`
+```
+$ mvn clean install
+```
 
 To run with spring-boot:
 
-`mvn spring-boot:run`
+```
+$ mvn spring-boot:run
+```
 
 To run with jar:
 
-`java -jar target/buddy-0.0.1.jar`
+```
+$ java -jar target/buddy-0.0.1.jar
+```
 
 
 ## GraalVM Native Support
