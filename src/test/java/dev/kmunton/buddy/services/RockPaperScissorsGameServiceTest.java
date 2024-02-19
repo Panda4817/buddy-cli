@@ -16,7 +16,7 @@ class RockPaperScissorsGameServiceTest {
     private final RockPaperScissorsGameService rockPaperScissorsGameService = new RockPaperScissorsGameService();
 
     @Test
-    public void whenGetOptions_thenReturnOptionsArray() {
+    void whenGetOptions_thenReturnOptionsArray() {
         String[] options = rockPaperScissorsGameService.getOptions();
         assertTrue(Arrays.asList(options).contains(ROCK));
         assertTrue(Arrays.asList(options).contains(PAPER));
@@ -24,7 +24,7 @@ class RockPaperScissorsGameServiceTest {
     }
 
     @Test
-    public void whenGetBuddyChoice_theReturnAnOption() {
+    void whenGetBuddyChoice_theReturnAnOption() {
         String buddyChoice = rockPaperScissorsGameService.getRandomChoice();
         assertTrue(Objects.equals(buddyChoice, ROCK)
                 || Objects.equals(buddyChoice, PAPER)
@@ -32,19 +32,19 @@ class RockPaperScissorsGameServiceTest {
     }
 
     @Test
-    public void givenUserPicksRockAndBuddyPicksPaper_whenCalculateWinner_thenReturnYouWinText() {
+    void givenUserPicksRockAndBuddyPicksPaper_whenCalculateWinner_thenReturnYouWinText() {
         String winnerText = rockPaperScissorsGameService.calculateWinnerBetweenBuddyAndUser(ROCK, PAPER);
         assertTrue(winnerText.contains("You win"));
     }
 
     @Test
-    public void givenUserPicksRockAndBuddyPicksRock_whenCalculateWinner_thenReturnTieText() {
+    void givenUserPicksRockAndBuddyPicksRock_whenCalculateWinner_thenReturnTieText() {
         String winnerText = rockPaperScissorsGameService.calculateWinnerBetweenBuddyAndUser(ROCK, ROCK);
         assertTrue(winnerText.contains("Tie"));
     }
 
     @Test
-    public void givenUserPicksRockAndBuddyPicksScissors_whenCalculateWinner_thenReturnBuddyWinText() {
+    void givenUserPicksRockAndBuddyPicksScissors_whenCalculateWinner_thenReturnBuddyWinText() {
         String winnerText = rockPaperScissorsGameService.calculateWinnerBetweenBuddyAndUser(ROCK, SCISSORS);
         assertTrue(winnerText.contains("Buddy wins"));
     }

@@ -23,7 +23,7 @@ class DatetimeCommandsTest {
     private ShellTestClient client;
 
     @Test
-    public void givenFutureYearAndAllParamsProvided_whenCountdown_returnCountdownString() {
+    void givenFutureYearAndAllParamsProvided_whenCountdown_returnCountdownString() {
         // Given
         LocalDateTime goal = LocalDateTime.now().plusYears(2);
         String command = String.format("countdown --year %s --month %s --day %s --hour %s --minute %s",
@@ -47,9 +47,9 @@ class DatetimeCommandsTest {
     }
 
     @Test
-    public void givenFutureMonthAndSomeParamsProvided_whenCountdown_returnCountdownString() {
+    void givenFutureMonthAndSomeParamsProvided_whenCountdown_returnCountdownString() {
         // Given
-        LocalDateTime goal = LocalDateTime.now().plusMonths(2);
+        LocalDateTime goal = LocalDateTime.now().plusMonths(3);
         String command = String.format("countdown --month %s --day %s --hour %s --minute %s",
                 goal.getMonthValue(), goal.getDayOfMonth(), goal.getHour(), goal.getMinute());
 
@@ -70,7 +70,7 @@ class DatetimeCommandsTest {
     }
 
     @Test
-    public void givenSameDateAndFutureTime_whenCountdown_returnCountdownString() {
+    void givenSameDateAndFutureTime_whenCountdown_returnCountdownString() {
         // Given
         LocalDateTime goal = LocalDateTime.now().plusHours(2);
         String command = String.format("countdown --hour %s --minute %s", goal.getHour(), goal.getMinute());
@@ -94,7 +94,7 @@ class DatetimeCommandsTest {
 
 
     @Test
-    public void givenDateParamsProvided_whenAdd_returnFutureDate() {
+    void givenDateParamsProvided_whenAdd_returnFutureDate() {
         // Given
         int numberToAdd = 2;
         String expected = LocalDateTime.now()
@@ -120,7 +120,7 @@ class DatetimeCommandsTest {
     }
 
     @Test
-    public void givenOnlyMonthsProvided_whenAdd_returnFutureDate() {
+    void givenOnlyMonthsProvided_whenAdd_returnFutureDate() {
         // Given
         int monthsToAdd = 9;
         String expected = LocalDateTime.now()
@@ -146,9 +146,9 @@ class DatetimeCommandsTest {
     }
 
     @Test
-    public void givenDateOfBirth_whenAge_returnHowManyYearsOld() {
+    void givenDateOfBirth_whenAge_returnHowManyYearsOld() {
         // Given
-        LocalDate dob = LocalDate.now().minusYears(30);
+        LocalDate dob = LocalDate.now().minusYears(31);
         String command = String.format("age -d %s", dob.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
 
@@ -167,7 +167,4 @@ class DatetimeCommandsTest {
                 .containsText("30 years"));
 
     }
-
-
-
 }

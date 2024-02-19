@@ -37,7 +37,7 @@ class FunCommandsTest {
     private RockPaperScissorsGameService rockPaperScissorsGameService;
 
     @Test
-    public void givenRandomJokeWanted_whenDadJokeCommandProvided_returnRandomJoke() {
+    void givenRandomJokeWanted_whenDadJokeCommandProvided_returnRandomJoke() {
         // Given
         DadJokeResponse testResponse = new DadJokeResponse("test", "joke");
         when(dadJokeClient.random()).thenReturn(testResponse);
@@ -61,7 +61,7 @@ class FunCommandsTest {
     }
 
     @Test
-    public void givenSearchTermProvided_whenDadJokeCommandProvided_returnJokesList() {
+    void givenSearchTermProvided_whenDadJokeCommandProvided_returnJokesList() {
         // Given
         DadJokeResponse testResponse1 = new DadJokeResponse("test1", "joke1");
         DadJokeResponse testResponse2 = new DadJokeResponse("test2", "joke2");
@@ -87,7 +87,7 @@ class FunCommandsTest {
     }
 
     @Test
-    public void givenCurrentXkcdComic_whenComicCommandProvided_returnComic() {
+    void givenCurrentXkcdComic_whenComicCommandProvided_returnComic() {
         // Given
         XkcdComicResponse response = new XkcdComicResponse("title", "image link", "alt text");
         when(xkcdClient.getCurrentComic()).thenReturn(response);
@@ -111,7 +111,7 @@ class FunCommandsTest {
     }
 
     @Test
-    public void givenUserWins_whenRpsPlayed_returnUserWinText() {
+    void givenUserWins_whenRpsPlayed_returnUserWinText() {
         // Given
         when(rockPaperScissorsGameService.getOptions()).thenReturn(new String[]{"rock", "paper", "scissors"});
         when(rockPaperScissorsGameService.getRandomChoice()).thenReturn("scissors");
@@ -138,7 +138,7 @@ class FunCommandsTest {
     }
 
     @Test
-    public void givenBuddyWins_whenRpsPlayed_returnUBuddyWinText() {
+    void givenBuddyWins_whenRpsPlayed_returnUBuddyWinText() {
         // Given
         when(rockPaperScissorsGameService.getOptions()).thenReturn(new String[]{"rock", "paper", "scissors"});
         when(rockPaperScissorsGameService.getRandomChoice()).thenReturn("scissors");

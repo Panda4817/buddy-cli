@@ -38,7 +38,7 @@ class InfoCommandsTest {
     private StackOverflowClient stackOverflowClient;
 
     @Test
-    public void givenQuestion_whenAskGpt_returnAnswer() {
+    void givenQuestion_whenAskGpt_returnAnswer() {
         // Given
         OpenAiMessage message = new OpenAiMessage("user", "answer");
         OpenAiChoice choice = new OpenAiChoice("id", message);
@@ -65,7 +65,7 @@ class InfoCommandsTest {
     }
 
     @Test
-    public void givenQuery_whenAskStack_returnListOfQuestions() {
+    void givenQuery_whenAskStack_returnListOfQuestions() {
         // Given
         StackOverflowItem item1 = new StackOverflowItem("1", "question 1", true);
         StackOverflowItem item2 = new StackOverflowItem("2", "question 2", false);
