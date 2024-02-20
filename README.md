@@ -9,6 +9,25 @@ Helpful terminal buddy with useful and fun commands, created using Spring Shell.
 - Maven
 - GraalVM
 
+## Pre-requisites
+
+The CLI uses ChatGPT and Vertex AI. 
+
+You will need a ChatGPT API key and a Google Cloud project with Vertex AI enabled.
+
+You will need to set these variables in the terminal:
+```
+$ export VERTEX_AI_PROJECT_ID=<your Google Cloud project ID>
+$ export VERTEX_AI_LOCATION=<your Google Cloud Vertex AI location>
+$ export CHATGPT_KEY=<your ChatGPT API key>
+```
+
+You will need to log in to your Google Cloud account using the `gcloud` CLI:
+```
+$ gcloud auth application-default login
+$ gcloud config set project <your Google Cloud project ID>  && gcloud auth login <your account email>
+```
+
 ## Maven
 
 To build jar and run tests:
