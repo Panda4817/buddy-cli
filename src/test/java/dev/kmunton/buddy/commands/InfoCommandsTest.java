@@ -2,14 +2,14 @@ package dev.kmunton.buddy.commands;
 
 import dev.kmunton.buddy.clients.OpenAiClient;
 import dev.kmunton.buddy.clients.StackOverflowClient;
-import dev.kmunton.buddy.models.dadjoke.DadJokeResponse;
-import dev.kmunton.buddy.models.dadjoke.DadJokesList;
 import dev.kmunton.buddy.models.openai.OpenAiChoice;
 import dev.kmunton.buddy.models.openai.OpenAiMessage;
 import dev.kmunton.buddy.models.openai.OpenAiRequest;
 import dev.kmunton.buddy.models.openai.OpenAiResponse;
 import dev.kmunton.buddy.models.stackoverflow.StackOverflowItem;
 import dev.kmunton.buddy.models.stackoverflow.StackOverflowResponse;
+import dev.kmunton.buddy.services.VertexAiService;
+import java.io.IOException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ShellTest
@@ -36,6 +37,9 @@ class InfoCommandsTest {
 
     @MockBean
     private StackOverflowClient stackOverflowClient;
+
+    @MockBean
+    private VertexAiService vertexAiService;
 
     @Test
     void givenQuestion_whenAskGpt_returnAnswer() {
@@ -89,6 +93,69 @@ class InfoCommandsTest {
                 .containsText(item1.title())
                 .containsText(item2.title()));
 
+    }
+
+    @Test
+    void givenNonFictionBook_whenSummaryRequested_returnSummary() throws IOException {
+        // Given
+        when(vertexAiService.getAnswer(anyString())).thenReturn("summary");
+        String command = "book -t 'test' -a 'John Smith'";
+
+        // When
+        ShellTestClient.InteractiveShellSession session = client
+            .interactive()
+            .run();
+
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
+            .containsText("shell"));
+
+        session.write(session.writeSequence().text(command).carriageReturn().build());
+
+        // Then
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
+            .containsText("summary"));
+    }
+
+    @Test
+    void givenProjectDescription_whenBoilerplateInstructionsRequested_returnInstructions() throws IOException {
+        // Given
+        when(vertexAiService.getAnswer(anyString())).thenReturn("instructions");
+        String command = "project -t 'java spring boot maven'";
+
+        // When
+        ShellTestClient.InteractiveShellSession session = client
+            .interactive()
+            .run();
+
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
+            .containsText("shell"));
+
+        session.write(session.writeSequence().text(command).carriageReturn().build());
+
+        // Then
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
+            .containsText("instructions"));
+    }
+
+    @Test
+    void givenWord_whenDefinitionRequested_returnDefinition() throws IOException {
+        // Given
+        when(vertexAiService.getAnswer(anyString())).thenReturn("definition");
+        String command = "define -w 'word'";
+
+        // When
+        ShellTestClient.InteractiveShellSession session = client
+            .interactive()
+            .run();
+
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
+            .containsText("shell"));
+
+        session.write(session.writeSequence().text(command).carriageReturn().build());
+
+        // Then
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
+            .containsText("definition"));
     }
 
 }

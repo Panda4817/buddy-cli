@@ -6,27 +6,44 @@ public record DateDifference(int years, int months, int days, int hours, int min
 
         StringBuilder resultBuilder = new StringBuilder();
 
+        if (hours < 0 || minutes < 0) {
+            resultBuilder.append("Just under").append("\n");
+        }
+
         if (years > 0) {
-            resultBuilder.append(years).append(years > 1 ? " years" : " year").append("\n");
+            resultBuilder.append(years)
+                .append(checkPlurality(years, " year", " years")).append("\n");
         }
 
         if (months > 0) {
-            resultBuilder.append(months).append(months > 1 ? " months": " month").append("\n");
+            resultBuilder.append(months)
+                .append(checkPlurality(months, " month", " months")).append("\n");
         }
 
         if (days > 0) {
-            resultBuilder.append(days).append(days > 1 ? " days": " day").append("\n");
+            resultBuilder.append(days)
+                .append(checkPlurality(days, " day", " days")).append("\n");
         }
 
         if (hours > 0) {
-            resultBuilder.append(hours).append(hours > 1 ? " hours": " hour").append("\n");
+            resultBuilder.append(hours)
+                .append(checkPlurality(hours, " hour", " hours")).append("\n");
         }
 
         if (minutes > 0) {
-            resultBuilder.append(minutes).append(minutes > 1 ? " minutes": " minute").append("\n");
+            resultBuilder.append(minutes)
+                .append(checkPlurality(minutes, " minute", " minutes")).append("\n");
         }
 
         resultBuilder.append(postfix);
         return resultBuilder.toString();
+    }
+
+    private String checkPlurality(int amount, String forOne, String forMany) {
+        if (amount > 1) {
+            return forMany;
+        }
+
+        return forOne;
     }
 }

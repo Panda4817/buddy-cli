@@ -1,14 +1,17 @@
 package dev.kmunton.buddy.commands;
 
 import dev.kmunton.buddy.models.datetime.DateDifference;
+import java.time.Duration;
+import java.time.Period;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import org.springframework.stereotype.Component;
 
+@Component
 @Command(group = "Date / Time Commands")
 public class DatetimeCommands {
 
@@ -76,41 +79,14 @@ public class DatetimeCommands {
     }
 
     private DateDifference calculateDateDifference(LocalDateTime current, LocalDateTime goal) {
-        int diffYears = 0;
-        int diffMonths = 0;
-        int diffDays = 0;
-        int diffHours = 0;
-        int diffMinutes = 0;
+        var period = Period.between(current.toLocalDate(), goal.toLocalDate());
+        var duration = Duration.between(goal.withHour(current.getHour()).withMinute(current.getMinute()), goal);
+        int diffYears = period.getYears();
+        int diffMonths = period.getMonths();
+        int diffDays = period.getDays();
+        int diffHours = duration.toHoursPart();
+        int diffMinutes = duration.toMinutesPart();
 
-
-        while(!current.isEqual(goal)) {
-            LocalDateTime newCurrent = current.plusMinutes(1);
-            diffMinutes += 1;
-
-            if (diffMinutes >= 60) {
-                diffHours += 1;
-                diffMinutes -= 60;
-            }
-
-            if (diffHours >= 24) {
-                diffDays += 1;
-                diffHours -= 24;
-            }
-
-            YearMonth yearMonthObject = YearMonth.of(newCurrent.getYear(), newCurrent.getMonthValue());
-            if (diffDays >= yearMonthObject.lengthOfMonth()) {
-                diffMonths += 1;
-                diffDays -= yearMonthObject.lengthOfMonth();
-            }
-
-            if (diffMonths >= 12) {
-                diffYears += 1;
-                diffMonths -= 12;
-            }
-
-            current = newCurrent;
-
-        }
         return new DateDifference(diffYears, diffMonths, diffDays, diffHours, diffMinutes);
     }
 }

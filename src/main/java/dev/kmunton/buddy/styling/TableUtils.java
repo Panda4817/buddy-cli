@@ -7,6 +7,8 @@ import org.springframework.shell.table.TableModel;
 
 public class TableUtils {
 
+    private TableUtils() {}
+
     public static String renderLightTable(TableModel model) {
         Table table = new TableBuilder(model)
                 .addFullBorder(BorderStyle.fancy_light)

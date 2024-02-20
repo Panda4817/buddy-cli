@@ -49,7 +49,7 @@ class DatetimeCommandsTest {
     @Test
     void givenFutureMonthAndSomeParamsProvided_whenCountdown_returnCountdownString() {
         // Given
-        LocalDateTime goal = LocalDateTime.now().plusMonths(3);
+        LocalDateTime goal = LocalDateTime.now().plusMonths(3).plusHours(1).plusMinutes(50).plusDays(1);
         String command = String.format("countdown --month %s --day %s --hour %s --minute %s",
                 goal.getMonthValue(), goal.getDayOfMonth(), goal.getHour(), goal.getMinute());
 
@@ -65,14 +65,17 @@ class DatetimeCommandsTest {
 
         // Then
         await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
-                .containsText("2 months"));
+                .containsText("3 months")
+                .containsText("1 day")
+                .containsText("1 hour")
+                .containsText("50 minutes"));
 
     }
 
     @Test
     void givenSameDateAndFutureTime_whenCountdown_returnCountdownString() {
         // Given
-        LocalDateTime goal = LocalDateTime.now().plusHours(2);
+        LocalDateTime goal = LocalDateTime.now().plusHours(2).plusMinutes(30);
         String command = String.format("countdown --hour %s --minute %s", goal.getHour(), goal.getMinute());
 
         // When
@@ -87,7 +90,8 @@ class DatetimeCommandsTest {
 
         // Then
         await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
-                .containsText("2 hours"));
+                .containsText("2 hours")
+                .containsText("30 minutes"));
 
     }
 
@@ -164,7 +168,33 @@ class DatetimeCommandsTest {
 
         // Then
         await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
-                .containsText("30 years"));
+                .containsText("31 years"));
+
+    }
+
+    @Test
+    void givenDateOfBirthWithDifferentMonthAndDay_whenAge_returnHowManyYearsMonthsDaysOld() {
+        // Given
+        LocalDate dob = LocalDate.now()
+            .minusYears(31).minusMonths(2).minusDays(1);
+        String command = String.format("age -d %s", dob.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+
+
+        // When
+        ShellTestClient.InteractiveShellSession session = client
+                .interactive()
+                .run();
+
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
+                .containsText("shell"));
+
+        session.write(session.writeSequence().text(command).carriageReturn().build());
+
+        // Then
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> ShellAssertions.assertThat(session.screen())
+                .containsText("31 years")
+                .containsText("2 months")
+                .containsText("1 day"));
 
     }
 }

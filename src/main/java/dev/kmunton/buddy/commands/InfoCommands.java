@@ -1,46 +1,38 @@
 package dev.kmunton.buddy.commands;
 
-import com.google.cloud.vertexai.api.Candidate;
 import dev.kmunton.buddy.clients.OpenAiClient;
 import dev.kmunton.buddy.clients.StackOverflowClient;
 import dev.kmunton.buddy.models.openai.OpenAiMessage;
 import dev.kmunton.buddy.models.openai.OpenAiRequest;
 import dev.kmunton.buddy.models.openai.OpenAiResponse;
 import dev.kmunton.buddy.models.stackoverflow.StackOverflowResponse;
+import dev.kmunton.buddy.services.VertexAiService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
 import org.springframework.shell.table.ArrayTableModel;
-import com.google.cloud.vertexai.VertexAI;
-import com.google.cloud.vertexai.api.Content;
-import com.google.cloud.vertexai.api.GenerateContentResponse;
-import com.google.cloud.vertexai.api.GenerationConfig;
-import com.google.cloud.vertexai.api.HarmCategory;
-import com.google.cloud.vertexai.api.Part;
-import com.google.cloud.vertexai.generativeai.GenerativeModel;
-import com.google.cloud.vertexai.api.SafetySetting;
-import com.google.cloud.vertexai.generativeai.ResponseStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 import static dev.kmunton.buddy.styling.TableUtils.renderLightTable;
 
+@Component
 @Command(group = "Info Commands")
 public class InfoCommands {
 
-    @Autowired
-    private OpenAiClient openAiClient;
+    private final OpenAiClient openAiClient;
+
+    private final StackOverflowClient stackOverflowClient;
+
+    private final VertexAiService vertexAiService;
 
     @Autowired
-    private StackOverflowClient stackOverflowClient;
-
-    @Value("${vertex.ai.project.id}")
-    private String vertexAiProjectId;
-
-    @Value("${vertex.ai.location}")
-    private String vertexAiLocation;
+    public InfoCommands(OpenAiClient openAiClient, StackOverflowClient stackOverflowClient,
+                        VertexAiService vertexAiService) {
+        this.openAiClient = openAiClient;
+        this.stackOverflowClient = stackOverflowClient;
+        this.vertexAiService = vertexAiService;
+    }
 
     @Command(command = "gpt", description = "Ask ChatGPT a question")
     public String askChatGpt(@Option(longNames = {"question"}, shortNames = {'q'}, required = true,
@@ -52,7 +44,7 @@ public class InfoCommands {
             return response.choices().get(0).message().content();
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return "Try https://chat.openai.com/";
+            return "Check OpenAI API usage or try free https://chat.openai.com/";
         }
 
     }
@@ -84,7 +76,7 @@ public class InfoCommands {
     }
 
     @Command(command = "book", description = "Summarise the key points from a non-fiction book")
-    public String summariseBookByVertexAI(@Option(longNames = {"title"}, shortNames = {'t'}, required = true,
+    public String summariseNonFictionBook(@Option(longNames = {"title"}, shortNames = {'t'}, required = true,
         description = "Title of book in single or double quotes") String title, @Option(longNames = {"author"}, shortNames = {'a'},
         required = true, description = "Author(s) of the book in single or double quotes") String author) {
 
@@ -93,52 +85,46 @@ public class InfoCommands {
             Make sure output is detailed with key points and explanations.
             """.formatted(title, author);
 
-        try (VertexAI vertexAi = new VertexAI(vertexAiProjectId, vertexAiLocation) ) {
-            GenerationConfig generationConfig =
-                GenerationConfig.newBuilder()
-                    .setMaxOutputTokens(2000)
-                    .setTemperature(0.6F)
-                    .setTopP(1F)
-                    .build();
-            GenerativeModel model = new GenerativeModel("gemini-pro", generationConfig, vertexAi);
-            List<SafetySetting> safetySettings = Arrays.asList(
-                SafetySetting.newBuilder()
-                    .setCategory(HarmCategory.HARM_CATEGORY_HATE_SPEECH)
-                    .setThreshold(SafetySetting.HarmBlockThreshold.BLOCK_LOW_AND_ABOVE)
-                    .build(),
-                SafetySetting.newBuilder()
-                    .setCategory(HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT)
-                    .setThreshold(SafetySetting.HarmBlockThreshold.BLOCK_LOW_AND_ABOVE)
-                    .build(),
-                SafetySetting.newBuilder()
-                    .setCategory(HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT)
-                    .setThreshold(SafetySetting.HarmBlockThreshold.BLOCK_LOW_AND_ABOVE)
-                    .build(),
-                SafetySetting.newBuilder()
-                    .setCategory(HarmCategory.HARM_CATEGORY_HARASSMENT)
-                    .setThreshold(SafetySetting.HarmBlockThreshold.BLOCK_LOW_AND_ABOVE)
-                    .build()
-            );
-            List<Content> contents = new ArrayList<>();
-            contents.add(Content.newBuilder().setRole("user").addParts(Part.newBuilder().setText(prompt)).build());
-
-            ResponseStream<GenerateContentResponse> responseStream =
-                model.generateContentStream(contents, safetySettings);
-            // Do something with the response
-            StringBuilder answer = new StringBuilder();
-            responseStream.stream().forEach(generateContentResponse -> {
-                var candidates = generateContentResponse.getCandidatesList();
-                for (Candidate candidate: candidates) {
-                    var parts = candidate.getContent().getPartsList();
-                    for (Part part : parts) {
-                        answer.append(part.getText());
-                    }
-                }
-            });
-            return answer.toString();
+        try {
+            return vertexAiService.getAnswer(prompt);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return "Check Google Cloud dashboard";
+            return "Check Google Cloud account or try free https://chat.openai.com/";
+        }
+    }
+
+    @Command(command = "project",
+        description = "Generate instructions to create boilerplate project code from a command line tool")
+    public String generateBoilerplateProjectInstructions(
+        @Option(longNames = {"type"}, shortNames = {'t'}, required = true,
+            description = "Project description in single or double quotes e.g. 'java spring boot maven'")
+        String projectDescription) {
+
+        String prompt = """
+            I want to create a %s project. What is the command to initialise the project from the terminal?
+            Explain how to install the command line tool and what the different parts of the command does.
+            Explain the project structure and how to run the project once it is initialised.
+            """.formatted(projectDescription);
+
+        try {
+            return vertexAiService.getAnswer(prompt);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return "Check Vertex AI API usage or try free https://chat.openai.com/";
+        }
+    }
+
+    @Command(command = "define", description = "Define an English word")
+    public String defineWord(@Option(longNames = {"word"}, shortNames = {'w'}, required = true,
+        description = "A word or phrase you want to define, wrap in single or double quotes if spaces") String word) {
+
+        String prompt = "Define the term '%s' in one paragraph".formatted(word);
+
+        try {
+            return vertexAiService.getAnswer(prompt);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return "Check Vertex AI API usage or try free https://chat.openai.com/ or Google search";
         }
     }
 }

@@ -15,23 +15,30 @@ import org.springframework.shell.standard.AbstractShellComponent;
 import org.springframework.shell.table.ArrayTableModel;
 
 import java.util.*;
+import org.springframework.stereotype.Component;
 
 import static dev.kmunton.buddy.styling.TableUtils.renderLightTable;
 import static org.springframework.util.StringUtils.hasText;
 
+@Component
 @Command(group = "Fun Commands")
 public class FunCommands extends AbstractShellComponent {
 
-    @Autowired
-    private DadJokeClient dadJokeClient;
+    private final DadJokeClient dadJokeClient;
+
+    private final XkcdClient xkcdClient;
+
+    private final RockPaperScissorsGameService rockPaperScissorsGameService;
 
     @Autowired
-    private XkcdClient xkcdClient;
+    public FunCommands(DadJokeClient dadJokeClient, XkcdClient xkcdClient,
+                       RockPaperScissorsGameService rockPaperScissorsGameService) {
+        this.dadJokeClient = dadJokeClient;
+        this.xkcdClient = xkcdClient;
+        this.rockPaperScissorsGameService = rockPaperScissorsGameService;
+    }
 
-    @Autowired
-    private RockPaperScissorsGameService rockPaperScissorsGameService;
-
-    @Command(command = "dadjoke", description = "I will tell you a random dad joke or give you a list of jokes bases on search term")
+    @Command(command = "dadjoke", description = "I will tell you a random dad joke or give you a list of jokes based on a search term")
     public String getDadJoke(@Option(longNames = {"search"}, shortNames = {'s'}, description = "Search term to get a list of maximum 30 jokes") String term) {
         if (!hasText(term)) {
             DadJokeResponse response = dadJokeClient.random();
