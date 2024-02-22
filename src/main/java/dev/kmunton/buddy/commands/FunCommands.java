@@ -6,6 +6,7 @@ import dev.kmunton.buddy.models.dadjoke.DadJokeResponse;
 import dev.kmunton.buddy.models.dadjoke.DadJokesList;
 import dev.kmunton.buddy.models.xkcd.XkcdComicResponse;
 import dev.kmunton.buddy.services.RockPaperScissorsGameService;
+import org.jline.utils.InfoCmp.Capability;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
@@ -96,6 +97,7 @@ public class FunCommands extends AbstractShellComponent {
     private String getSingleUserChoice(SingleItemSelector<String, SelectorItem<String>> component) {
         SingleItemSelector.SingleItemSelectorContext<String, SelectorItem<String>> context = component
                 .run(SingleItemSelector.SingleItemSelectorContext.empty());
+        getTerminal().puts(Capability.cursor_normal);
         return context.getResultItem().flatMap(si -> Optional.ofNullable(si.getItem())).orElseThrow();
     }
 }
