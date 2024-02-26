@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
 import org.springframework.shell.component.SingleItemSelector;
+import org.springframework.shell.component.StringInput;
+import org.springframework.shell.component.StringInput.StringInputContext;
 import org.springframework.shell.component.support.SelectorItem;
 import org.springframework.shell.standard.AbstractShellComponent;
 import org.springframework.shell.table.ArrayTableModel;
@@ -76,6 +78,46 @@ public class FunCommands extends AbstractShellComponent {
 
         return rockPaperScissorsGameService.calculateWinnerBetweenBuddyAndUser(buddyChoice, userChoice);
 
+    }
+
+    @Command(command = "guess", description = "Play guess the number game")
+    public String playGuessTheNumber() {
+        int buddyNumber = new Random().nextInt(1, 100);
+        System.out.println("I have chosen a number. You need to guess it.");
+
+        var inputComponent = getStringInputComponent();
+
+        int chosenNumber = 0;
+        int guesses = 0;
+
+        while (chosenNumber != buddyNumber) {
+            StringInputContext context = inputComponent.run(StringInputContext.empty());
+            try {
+                chosenNumber = Integer.parseInt(context.getResultValue());
+                if (chosenNumber > buddyNumber) {
+                    System.out.println("Lower");
+                } else if (chosenNumber < buddyNumber) {
+                    System.out.println("Higher");
+                }
+                guesses++;
+            } catch (Exception e) {
+                System.out.println("Enter a number between 0 and 100");
+            }
+
+        }
+
+        getTerminal().puts(Capability.cursor_normal);
+        if (guesses == 1) {
+            return "1 guess to the correct number";
+        }
+        return "%s guesses to the correct number".formatted(guesses);
+    }
+
+    private StringInput getStringInputComponent() {
+        StringInput component = new StringInput(getTerminal(), "Enter your guess", "50");
+        component.setResourceLoader(getResourceLoader());
+        component.setTemplateExecutor(getTemplateExecutor());
+        return component;
     }
 
     private List<SelectorItem<String>> getSelectorStringItems(String[] options) {
